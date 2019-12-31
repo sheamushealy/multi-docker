@@ -1,12 +1,13 @@
+language: generic
 sudo: required
 services:
     - docker
 
 before_install:
-    - docker build -t  sheamushealy/react-test -f ./client/Dockerfile.dev ./client
+    - docker build -t sheamushealy/react-test -f ./client/Dockerfile.dev ./client
 
 script:
-    - docker run sheamushealy/react-test npm test -- --coverage
+    - docker run -e CI=true sheamushealy/react-test npm test
 
 after_success:
     docker build -t sheamushealy/multi-client ./client
