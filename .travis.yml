@@ -1,0 +1,24 @@
+sudo: required
+services:
+    - docker
+
+before_install:
+    - docker build -t  sheamushealy/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+    - docker run sheamushealy/react-test npm test -- --coverage
+
+after_success:
+    docker build -t sheamushealy/multi-client ./client
+    docker build -t sheamushealy/multi-nginx ./nginx
+    docker build -t sheamushealy/multi-server ./server
+    docker build -t sheamushealy/multi-worker ./worker
+
+#log into docker cli in a single command
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+
+# take images and push to docker hub
+    - docker push sheamushealy/multi-client
+    - docker push sheamushealy/multi-nginx
+    - docker push sheamushealy/multi-server
+    - docker push sheamushealy/multi-worker
